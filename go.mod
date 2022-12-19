@@ -10,11 +10,13 @@ require (
 	golang.org/x/crypto v0.1.0
 	golang.org/x/sys v0.1.0
 	golang.zx2c4.com/wireguard v0.0.0-20220920152132-bb719d3a6e2c
+	gopkg.in/ini.v1 v1.67.0
 )
 
 require (
 	github.com/josharian/native v1.0.0 // indirect
 	github.com/mdlayher/socket v0.2.3 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 )
