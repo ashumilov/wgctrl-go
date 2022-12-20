@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,6 +46,8 @@ func main() {
 				showEndpoints(iface, devices)
 			} else if param == "allowed-ips" {
 				showAllowedIPs(iface, devices)
+			} else if param == "fwmark" {
+				showFirewallMark(iface, devices)
 			} else {
 				showDevice(iface, devices)
 			}
@@ -57,11 +60,36 @@ func main() {
 	case "setconf":
 		iface := flag.Arg(1)
 		file := flag.Arg(2)
-		if iface != "" && file != ""{
+		if iface != "" && file != "" {
 			setConf(iface, file, c)
+		}
+	case "set":
+		iface := flag.Arg(1)
+		key := flag.Arg(2)
+		value := flag.Arg(3)
+		if iface != "" && key != "" && value != "" {
+			set(iface, key, value, c)
 		}
 	default:
 		showAll(devices)
+	}
+}
+
+func set(name string, key string, value string, client *wgctrl.Client) {
+	wg_cfg := wgtypes.Config{}
+
+	switch key {
+	case "fwmark":
+		fwmark, err := strconv.Atoi(value)
+		if err != nil {
+			log.Fatalf("error setting fwmark %v : %s", value, err)
+		}
+		wg_cfg.FirewallMark = &fwmark
+	}
+
+	err := client.ConfigureDevice(name, wg_cfg)
+	if err != nil {
+		log.Fatalf("error setting configuration %v : %s", wg_cfg, err)
 	}
 }
 
@@ -206,6 +234,18 @@ func showAllowedIPs(name string, devices []*wgtypes.Device) {
 	if device != nil {
 		for _, peer := range device.Peers {
 			fmt.Printf("%s    %s", peer.PublicKey.String(), ipsString(peer.AllowedIPs, " "))
+		}
+	}
+	fmt.Printf("\n")
+}
+
+func showFirewallMark(name string, devices []*wgtypes.Device) {
+	device := getDevice(name, devices)
+	if device != nil {
+		if device.FirewallMark != 0 {
+			fmt.Printf("0x%x", device.FirewallMark)
+		} else {
+			fmt.Printf("off")
 		}
 	}
 	fmt.Printf("\n")
