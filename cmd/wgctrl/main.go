@@ -48,6 +48,8 @@ func main() {
 				showAllowedIPs(iface, devices)
 			} else if param == "fwmark" {
 				showFirewallMark(iface, devices)
+			} else if param == "transfer" {
+				showTransfer(iface, devices)
 			} else {
 				showDevice(iface, devices)
 			}
@@ -246,6 +248,16 @@ func showFirewallMark(name string, devices []*wgtypes.Device) {
 			fmt.Printf("0x%x", device.FirewallMark)
 		} else {
 			fmt.Printf("off")
+		}
+	}
+	fmt.Printf("\n")
+}
+
+func showTransfer(name string, devices []*wgtypes.Device) {
+	device := getDevice(name, devices)
+	if device != nil {
+		for _, peer := range device.Peers {
+			fmt.Printf("%s    %d %d", peer.PublicKey.String(), peer.ReceiveBytes, peer.TransmitBytes)
 		}
 	}
 	fmt.Printf("\n")
